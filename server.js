@@ -83,7 +83,7 @@ const start = async () => {
       path: "/login",
       handler: async (request, h) => {
         console.log("server post /login payload", request.payload);
-        const { username, password } = request.payload;
+        const { username, password } = JSON.parse(request.payload);
         const account = users.find((user) => user.username === username);
 
         if (!account || !(await Bcrypt.compare(password, account.password))) {
@@ -92,7 +92,8 @@ const start = async () => {
 
         request.cookieAuth.set({ id: account.id });
         // h.state("data");
-        //return h.redirect("/");
+        //return h.redirect1("/");
+        return h.response(JSON.stringify(request.headers));
         return h.response("Hello");
         // return h.response("Hello").state({ "sid-example": { id: "2133d32a" } });
       },
