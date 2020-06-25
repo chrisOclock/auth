@@ -16,7 +16,10 @@ const start = async () => {
   const server = Hapi.server({
     port: 4000,
     routes: {
-      cors: true,
+      cors: {
+        origin: ["*"],
+        credentials: true,
+      },
     },
   });
 
@@ -28,10 +31,12 @@ const start = async () => {
       name: "sid-example",
       password: "!wsYhFA*C2U6nz=Bu^%A@^F#SF3&kSR6",
       isSecure: false,
+      isHttpOnly: true,
     },
     redirectTo: "/login",
     validateFunc: async (request, session) => {
       console.log("server cookie session", session);
+      // console.log("server cookie request", request);
       const account = await users.find((user) => user.id === session.id);
 
       if (!account) {
@@ -86,8 +91,10 @@ const start = async () => {
         }
 
         request.cookieAuth.set({ id: account.id });
-
-        return h.redirect("/");
+        // h.state("data");
+        //return h.redirect("/");
+        return h.response("Hello");
+        // return h.response("Hello").state({ "sid-example": { id: "2133d32a" } });
       },
       options: {
         auth: {
