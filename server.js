@@ -13,18 +13,25 @@ const users = [
 ];
 
 const start = async () => {
-  const server = Hapi.server({ port: 4000 });
+  const server = Hapi.server({
+    port: 4000,
+    routes: {
+      cors: true,
+    },
+  });
 
   await server.register(require("@hapi/cookie"));
 
   server.auth.strategy("session", "cookie", {
     cookie: {
+      path: "/",
       name: "sid-example",
       password: "!wsYhFA*C2U6nz=Bu^%A@^F#SF3&kSR6",
       isSecure: false,
     },
     redirectTo: "/login",
     validateFunc: async (request, session) => {
+      console.log("server cookie session", session);
       const account = await users.find((user) => user.id === session.id);
 
       if (!account) {
@@ -70,6 +77,7 @@ const start = async () => {
       method: "POST",
       path: "/login",
       handler: async (request, h) => {
+        console.log("server post /login payload", request.payload);
         const { username, password } = request.payload;
         const account = users.find((user) => user.username === username);
 
